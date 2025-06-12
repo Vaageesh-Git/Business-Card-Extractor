@@ -1,5 +1,4 @@
-from pathlib import Path
-import mimetypes, os, base64, pytesseract, fitz, re
+import os, base64, pytesseract, fitz, re, requests
 import google.generativeai as genai
 from dotenv import load_dotenv
 from openpyxl import Workbook, load_workbook
@@ -7,21 +6,24 @@ from PIL import Image
 from io import BytesIO
 load_dotenv()
 
-def extractor(path):
-    file_type,_ = mimetypes.guess_type(path,strict=True)
+def extractor(url):
+    response = requests.get(url)
+    if response.status_code != 200:
+        raise Exception("Failed to download the file from URL")
+    content_type = response.headers.get("Content-Type")
+    file_type = content_type.split(";")[0] if content_type else None
+
     API_KEY = os.getenv("GEMINI_API_KEY")
     genai.configure(api_key=API_KEY)
-    if not path.exists():
-        raise FileNotFoundError("File Does Not Exist in the given path")
     
     column_heading = ["Company", "Phone", "Email", "Address", "Name","Designation", "Website"]
     
-    print(file_type) 
+    print("File Type", file_type) 
     extracted_data = []
 
     pages = []
     if file_type == "application/pdf":
-        doc = fitz.open(str(path))
+        doc = fitz.open("pdf", response.content)
         print(f"📄 Extracting {len(doc)} pages from PDF...")
         
         for page_number in range(len(doc)):
@@ -34,7 +36,7 @@ def extractor(path):
 
     elif file_type in ["image/jpeg", "image/png"]:
         try:
-            img = Image.open(path)
+            img = Image.open(BytesIO(response.content))
             pages = [img]
         except Exception as e:
             print("❌ Error opening image:", e)
@@ -142,5 +144,5 @@ def extractor(path):
         if any(dt != "" for dt in row_data):
             ws.append(row_data)
         wb.save(excel_file)
-extractor(Path("")) # add the path here inside the strings
+extractor("")          # add the url here inside the string 
 
