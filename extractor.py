@@ -63,7 +63,8 @@ def extractor(path):
                 Address: [Full Address]
                 Name: [Full Name]
                 Designation: [Designation]
-                Website: [Website URL]  
+                Website: [Website URL] 
+                If the language of the card is differnt from English, convert the details into English language and then give the details
                 Return plain text only. Do not use asterisks, bullets, or markdown formatting.
                 Do not include any explanations or extra text. If any field is not found, leaveit blank.''',
                 {
