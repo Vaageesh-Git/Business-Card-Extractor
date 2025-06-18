@@ -126,7 +126,7 @@ def extractor(url):
                 print("OCR Error", e)
         
         extracted_data.append(data)
-        excel_file = "extracted_data.xlsx"
+        excel_file = "Visiting Cards.xlsx"
         if os.path.exists(excel_file):
             wb = load_workbook(excel_file)
             ws = wb.active
@@ -144,5 +144,7 @@ def extractor(url):
         if any(dt != "" for dt in row_data):
             ws.append(row_data)
         wb.save(excel_file)
-extractor("")          # add the url here inside the string 
 
+input_links = []          # paste comma (,) seperated Links Here inside quotes -->
+for link in input_links:
+    extractor(link)
